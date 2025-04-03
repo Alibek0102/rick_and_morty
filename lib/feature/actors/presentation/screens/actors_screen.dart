@@ -31,7 +31,7 @@ class _ActorsScreenState extends State<ActorsScreen> {
   }
 
   void _loadMore() {
-    if (_scrollController.position.pixels ==
+    if (_scrollController.position.pixels + 100 ==
         _scrollController.position.maxScrollExtent) {
       BlocProvider.of<ActorsBloc>(context).add(ActorsMoreFetched());
     }
