@@ -19,5 +19,28 @@ class ActorsBloc extends Bloc<ActorsBlocEvent, ActorsBlocState> {
         emit(state.copyWith(status: Status.failure));
       }
     });
+
+    on<ActorsMoreFetched>((event, emit) async {
+      if (state.hasReachedMax || state.nextPageLoader) return;
+
+      try {
+        emit(state.copyWith(nextPageLoader: true));
+        final int nextPage = state.page + 1;
+        List<ActorsModel> nextList =
+            await actorsRepository.getActors(page: nextPage);
+
+        if (nextList.isEmpty) {
+          return emit(state.copyWith(hasReachedMax: true));
+        }
+
+        emit(state.copyWith(
+            status: Status.success,
+            actors: [...state.actors, ...nextList],
+            page: nextPage,
+            nextPageLoader: false));
+      } catch (_) {
+        emit(state.copyWith(status: Status.failure));
+      }
+    });
   }
 }
